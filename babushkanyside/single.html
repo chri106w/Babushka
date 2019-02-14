@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babushka</title>
+    <link href="https://fonts.googleapis.com/css?family=Staatliches" rel="stylesheet">
+</head>
+
+<style>
+    body {
+        background-image: url(plaid-checks-background-orange.jpg);
+        background-repeat: repeat;
+        font-family: monospace;
+        box-sizing: border-box;
+    }
+
+    #single {
+        background-color: hsla(0, 15%, 40%, 30%);
+    }
+
+    #indhold {
+        min-height: 50vh;
+        background-color: lightgray;
+        width: 70vw;
+        margin: 4rem auto;
+    }
+
+    #tilbage button {
+        font-size: 2rem;
+        padding: 1rem 2rem;
+        border: none;
+        background-color: darkslategray;
+        color: orange;
+        cursor: pointer;
+    }
+
+
+    .style {
+        border: 2px grey solid;
+    }
+
+    img {
+        width: 100%;
+    }
+
+    .h1 {
+        text-align: left;
+    }
+
+</style>
+
+
+<body>
+
+    <div id="single">
+        <div id="tilbage">
+            <button>
+                tilbage </button></div>
+        <section id="indhold">
+        </section>
+    </div>
+
+
+
+    <script>
+        let urlParams = new URLSearchParams(window.location.search)
+        let id = urlParams.get("id");
+
+        document.addEventListener("DOMContentLoaded", start);
+
+        function start() {
+            let alleRetter = [];
+            hentJson();
+            async function hentJson() {
+                let jsonData = await fetch("https://mandalskeawebspace.dk/claude_php/clean_up_spreadsheet.php?id=1jxxxFoWBuMJ1qhQ9BQIAyKHmP38XtAF9_sQr0xo5JLo");
+                alleRetter = await jsonData.json();
+                visRet();
+            }
+
+            function visRet() {
+                let destination = document.querySelector("#indhold");
+                alleRetter.forEach(ret => {
+                    if (id == ret.id) {
+                        let template = `
+                        
+                        <div class="style">
+                          <h2 id="navn">${ret.navn}</h2>
+                            <div class="img-container">
+                            <img src = imgs/large/${ret.billede}.jpg>
+                            </div>
+                            <p>${ret.kategori}</p>
+                            <p>Pris: ${ret.pris},-</p>
+                            <p>${ret.lang}</p>
+                        </div>`;
+                        destination.insertAdjacentHTML("beforeend", template);
+
+                    } //slut if
+                }) // slut forEacjh
+            } //slut visPerson
+
+            document.querySelector("#tilbage").addEventListener("click", () => {
+                location.href = "index.html";
+            })
+
+        }
+
+    </script>
+</body>
+
+</html>

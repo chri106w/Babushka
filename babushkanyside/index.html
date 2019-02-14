@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="dk">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babushka</title>
+    <link href="https://fonts.googleapis.com/css?family=Staatliches" rel="stylesheet">
+</head>
+
+<style>
+    body {
+        background-image: url(plaid-checks-background-orange.jpg);
+        background-repeat: repeat;
+        font-family: monospace;
+        box-sizing: border-box;
+    }
+
+    h1 {
+        text-align: center;
+        text-transform: uppercase;
+        font-family: 'Staatliches', cursive;
+        color: darkslategray;
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 2rem;
+        color: darkslategray;
+    }
+
+    h3 {
+        text-align: right;
+        font-size: 2rem;
+        color: darkslategray;
+        font-family: 'Staatliches', cursive;
+    }
+
+    .menu button {
+        text-align: center;
+        padding: 1vw;
+        border: none;
+        background-color: darkslategray;
+        color: orange;
+        cursor: pointer;
+
+    }
+
+    .style {
+        background-color: lightgray;
+        text-align: center;
+        padding: 2vw;
+    }
+
+    #navn {
+        height: 7vw;
+        margin-top: 1vw;
+        margin-bottom: 0;
+    }
+
+    p {
+        margin: 2vw;
+    }
+
+    .img-container {
+        background-color: beige;
+        height: 50vw;
+        overflow: hidden;
+    }
+
+    img {
+        width: 100%;
+    }
+
+    @media only screen and (min-width: 600px) {
+        font-size: 7rem;
+
+        #liste {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .img-container {
+            height: 30vw;
+        }
+    }
+
+    @media only screen and (min-width: 800px) {
+        h1 {
+            font-size: 5vw;
+        }
+
+        #liste {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .img-container {
+            height: 19vw;
+        }
+    }
+
+    @media only screen and (min-width: 1300px) {
+        body {
+            margin-left: 6vw;
+            margin-right: 6vw;
+        }
+
+        .img-container {
+            height: 15vw;
+        }
+    }
+
+</style>
+
+
+<body>
+
+    <header>
+        <h1>Babushka</h1>
+    </header>
+
+    <div class="menu">
+        <button class="filter valgt" data-kategori="alle">Alle</button>
+        <button class="filter" data-kategori="forretter">Forretter</button>
+        <button class="filter" data-kategori="hovedretter">Hovedretter</button>
+        <button class="filter" data-kategori="desserter">Desserter</button>
+    </div>
+
+    <h3>Forretter</h3>
+
+    <div id="liste">
+    </div>
+
+
+    <script>
+        let retter = [];
+        let filter = "alle";
+        document.addEventListener("DOMContentLoaded", start);
+
+        function start() {
+            let alleRetter = [];
+            hentJson();
+            async function hentJson() {
+                let jsonData = await fetch("https://mandalskeawebspace.dk/claude_php/clean_up_spreadsheet.php?id=1jxxxFoWBuMJ1qhQ9BQIAyKHmP38XtAF9_sQr0xo5JLo");
+                alleRetter = await jsonData.json();
+                visRet();
+            }
+
+            function visRet() {
+                let destination = document.querySelector("#liste");
+                destination.innerHTML = "";
+                alleRetter.forEach(ret => {
+                    if (filter == "alle" || filter == ret.kategori) {
+                        let template = `
+                        
+                        <div class="style">
+                          <h2 id="navn">${ret.navn}</h2>
+                            <div class="img-container">
+                            <img src = imgs/large/${ret.billede}.jpg>
+                            </div>
+                            <p>${ret.kategori}</p>
+                            <p>Pris: ${ret.pris},-</p>
+                            <p>${ret.kort}</p>
+                        </div>`;
+                        destination.insertAdjacentHTML("beforeend", template);
+                        destination.lastElementChild.addEventListener("click", () => {
+                            location.href = "single.html?id=" + ret.id;
+                        });
+
+                    } //slut if
+                }) // slut forEacjh
+            } //slut visPerson
+
+            document.querySelectorAll(".filter").forEach(but => {
+                but.addEventListener("click", filtrering);
+            });
+
+            function filtrering() {
+                document.querySelectorAll(".filter").forEach(but => {
+                    but.classList.remove("valgt");
+                })
+                this.classList.add("valgt");
+                document.querySelector("h3").textContent = this.textContent;
+                filter = this.getAttribute("data-kategori");
+                visRet();
+            }
+        }
+
+    </script>
+</body>
+
+</html>
